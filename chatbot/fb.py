@@ -5,7 +5,8 @@ flask api to deal with facebook stuff
 
 import random
 from flask import Flask, request
-from pymessenger2.bot import Bot
+from pymessenger.bot import Bot
+from pymessenger2.bot import Bot as Bot2
 
 from config import *
 from dialogflow import *
@@ -14,6 +15,7 @@ app = Flask(__name__)
 ACCESS_TOKEN = FB_ACCESS_TOKEN
 VERIFY_TOKEN = FB_VERIFY_TOKEN
 bot = Bot(ACCESS_TOKEN)
+bot2 = Bot2(ACCESS_TOKEN)
 
 @app.route("/", methods=['GET', 'POST'])
 def receive_message():
@@ -24,22 +26,26 @@ def receive_message():
         return verify_fb_token(token_sent)
     #if request was not get, we can assume it was POST
     else:
-        print("got a post")
-        output = request.get_json()
-        for event in output['entry']:
-          messaging = event['messaging']
-          for message in messaging:
-            if message.get('message'):
-                recipient_id = message['sender']['id'] #Facebook Messenger ID of user
-                received_msg = message['message'].get('text')
-                msgs = handle_user_message(received_msg, recipient_id)
-                if msgs:
-                    for msg in msgs:
-                        if isinstance(msg, str):
-                            send_message(recipient_id, msg)
-                        else:
-                            #it's an image object
-                            send_image(recipient_id, msg["path"])
+        try:
+            print("got a post")
+            output = request.get_json()
+            for event in output['entry']:
+                messaging = event['messaging']
+                for message in messaging:
+                    if message.get('message'):
+                        recipient_id = message['sender']['id'] #Facebook Messenger ID of user
+                        received_msg = message['message'].get('text')
+                        msgs = handle_user_message(received_msg, recipient_id)
+                        if msgs:
+                            for msg in msgs:
+                                if isinstance(msg, str):
+                                    send_message(recipient_id, msg)
+                                else:
+                                    #it's an image object
+                                    send_image(recipient_id, msg["path"])
+        except:
+            print("error occurred")
+            return "msg processed"
     return "msg processed"
 
 def verify_fb_token(token_sent):
@@ -56,7 +62,7 @@ def send_message(recipient_id, response):
     return "success"
 
 def send_image(recipient_id, path):
-    bot.send_image(recipient_id, path)
+    bot2.send_image(recipient_id, path)
     return "success"
 
 if __name__ == "__main__":
