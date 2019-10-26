@@ -5,7 +5,7 @@ flask api to deal with facebook stuff
 
 import random
 from flask import Flask, request
-from pymessenger.bot import Bot
+from pymessenger2.bot import Bot
 
 from config import *
 from dialogflow import *
@@ -35,7 +35,11 @@ def receive_message():
                 msgs = handle_user_message(received_msg, recipient_id)
                 if msgs:
                     for msg in msgs:
-                        send_message(recipient_id, msg)
+                        if isinstance(msg, str):
+                            send_message(recipient_id, msg)
+                        else:
+                            #it's an image object
+                            send_image(recipient_id, msg["path"])
     return "msg processed"
 
 def verify_fb_token(token_sent):
@@ -49,6 +53,10 @@ def verify_fb_token(token_sent):
 def send_message(recipient_id, response):
     #sends user the text message provided via input response parameter
     bot.send_text_message(recipient_id, response)
+    return "success"
+
+def send_image(recipient_id, path):
+    bot.send_image(recipient_id, path)
     return "success"
 
 if __name__ == "__main__":
