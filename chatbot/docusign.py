@@ -31,7 +31,8 @@ base_path = 'https://demo.docusign.net/restapi'
 
 # Set FLASK_ENV to development if it is not already set
 if 'FLASK_ENV' not in os.environ:
-    os.environ['FLASK_ENV'] = 'development'
+    pass
+    #os.environ['FLASK_ENV'] = 'development'
 
 # Constants
 APP_PATH = os.path.dirname(os.path.abspath(__file__))
