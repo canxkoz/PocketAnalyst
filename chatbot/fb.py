@@ -26,26 +26,23 @@ def receive_message():
         return verify_fb_token(token_sent)
     #if request was not get, we can assume it was POST
     else:
-        try:
-            print("got a post")
-            output = request.get_json()
-            for event in output['entry']:
-                messaging = event['messaging']
-                for message in messaging:
-                    if message.get('message'):
-                        recipient_id = message['sender']['id'] #Facebook Messenger ID of user
-                        received_msg = message['message'].get('text')
-                        msgs = handle_user_message(received_msg, recipient_id)
-                        if msgs:
-                            for msg in msgs:
-                                if isinstance(msg, str):
-                                    send_message(recipient_id, msg)
-                                else:
-                                    #it's an image object
-                                    send_image(recipient_id, msg["path"])
-        except:
-            print("error occurred")
-            return "msg processed"
+        print("got a post")
+        output = request.get_json()
+        for event in output['entry']:
+            messaging = event['messaging']
+            for message in messaging:
+                if message.get('message'):
+                    recipient_id = message['sender']['id'] #Facebook Messenger ID of user
+                    received_msg = message['message'].get('text')
+                    msgs = handle_user_message(received_msg, recipient_id)
+                    if msgs:
+                        for msg in msgs:
+                            if isinstance(msg, str):
+                                send_message(recipient_id, msg)
+                            else:
+                                #it's an image object
+                                send_image(recipient_id, msg["path"])
+        return "msg processed"
     return "msg processed"
 
 def verify_fb_token(token_sent):

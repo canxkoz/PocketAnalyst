@@ -15,6 +15,7 @@ def createUser(userObj):
 
     user = datastore.Entity(key=user_key)
     user.update(userObj)
+    user["pairs"] = {}
     datastore_client.put(user)
     result = datastore_client.get(user_key)
     print(result)
@@ -25,7 +26,21 @@ def getUser(id):
     query.add_filter("id", "=", id)
     users = query.fetch(limit=10)
     for u in users:
-        print(u)
+        return u
+
+def changePair(id, ticker, amount):
+    #adds "amount" to currency/security ticker
+    u = getUser(id)
+    if ticker not in u["pairs"]:
+        u["pairs"][ticker] = amount
+    else:
+        u["pairs"][ticker] += amount
+    datastore_client.put(u)
+    return u
+
+def getPairs(id):
+    u = getUser(id)
+    return dict(u["pairs"])
 
 def getUserById(id):
     user_key = datastore_client.key("User", id)
