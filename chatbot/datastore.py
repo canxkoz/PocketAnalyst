@@ -27,6 +27,7 @@ def getUser(id):
     users = query.fetch(limit=10)
     for u in users:
         return u
+    return
 
 def changePair(id, ticker, amount):
     #adds "amount" to currency/security ticker
